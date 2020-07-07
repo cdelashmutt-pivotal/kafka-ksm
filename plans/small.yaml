@@ -1,0 +1,11 @@
+kafka:
+  createJaasSecret: true
+externalAccess:
+  enabled: true
+  autoDiscovery:
+    enabled: true
+rbac:
+  create: true
+auth:
+  clientProtocol: sasl
+  interBrokerProtocol: sasl

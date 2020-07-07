@@ -1,0 +1,20 @@
+# The bind.yaml is optional.
+# Apps running in Pivotal Application Service gain access to bound service instances through an 
+#     environment variable named VCAP_SERVICES consisting of a credentials map.
+# Create a binding template with desired bind format for the chart to be exposed. 
+#
+# The example below shows all available information, so you can use that to compose your own template.
+#
+# NOTE: Refer to the "(Optional) Create Binding Template for App Consumption" section in the "Preparing a Service Offering" document 
+#     at https://docs.pivotal.io/ksm if you need further information.
+template: |
+  local filterfunc(j) = j.metadata.labels['app.kubernetes.io/name']=='kafka' && j.metadata.labels['app.kubernetes.io/component']=='kafka' && std.length(std.findSubstr("external", j.name)) > 0;
+  local filteredsvcs = std.filter(filterfunc, $.services);
+  local port = filteredsvcs[0].spec.ports[0].port;
+  local mapFunc(s) = s.status.loadBalancer.ingress[0].ip + ":" + port;
+  local svcIps = std.filterMap(filterfunc, mapFunc, filteredsvcs);
+  {
+    brokers: std.join(",", svcIps),
+    username: "user",
+    password: $.secrets[0].data['client-password']
+  }

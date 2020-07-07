@@ -1,0 +1,6 @@
+marketplace-name: kafka
+charts:				 
+- chart: kafka 
+  version: 11.3.2
+  scope: namespace
+  offered: true
